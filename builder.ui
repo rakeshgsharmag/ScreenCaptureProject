@@ -142,8 +142,16 @@
                     <property name="margin_right">40</property>
                     <property name="button_sensitivity">on</property>
                     <items>
-                      <item id="Framerate_20" translatable="yes">20</item>
+					  <item id="Framerate_10" translatable="yes">10</item>
+                      <item id="Framerate_15" translatable="yes">15</item>
+					  <item id="Framerate_20" translatable="yes">20</item>
+                      <item id="Framerate_25" translatable="yes">25</item>
                       <item id="Framerate_30" translatable="yes">30</item>
+					  <item id="Framerate_35" translatable="yes">35</item>
+                      <item id="Framerate_40" translatable="yes">40</item>
+					  <item id="Framerate_45" translatable="yes">45</item>
+					  <item id="Framerate_50" translatable="yes">50</item>
+					  <item id="Framerate_55" translatable="yes">55</item>
                       <item id="Framerate_60" translatable="yes">60</item>
                     </items>
                   </object>
@@ -301,11 +309,11 @@
                 </child>
                 <child>
                   <object class="GtkLinkButton" id="linkbutton">
-                    <property name="label" translatable="yes">www.acuiticonsultants.co.uk</property>
+                    <property name="label" translatable="yes">http://seequestor.com/</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="uri">http://www.acuiticonsultants.co.uk/</property>
+                    <property name="uri">http://seequestor.com/</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
