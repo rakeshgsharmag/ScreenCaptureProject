@@ -1,4 +1,3 @@
-#this is main Makefile
 INCLUDES = -I "D:\gtk+-bundle_3.6.4\include\gtk-3.0" \
 		   -I "D:\gtk+-bundle_3.6.4\include\cairo" \
 		   -I "D:\gtk+-bundle_3.6.4\include\pango-1.0" \

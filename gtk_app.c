@@ -7,6 +7,7 @@ int state_handler( Gst* gst, GstStateChangeReturn state )
 	GstStateChangeReturn ret = GST_STATE_CHANGE_SUCCESS;
 	if( state == (GstStateChangeReturn) GST_STATE_NULL )
 	{
+        flag = 1;
 		ret = gst_element_set_state( gst->source, GST_STATE_PAUSED );
 		if( ret == GST_STATE_CHANGE_FAILURE )
 		{
@@ -121,34 +122,36 @@ int create_elements( Gst* gst, char* location )
 
 	/* Create gstreamer elements */
 	gst->pipeline         = gst_pipeline_new( "pipeline" );
-
-	gst->source           = gst_element_factory_make( "gdiscreencapsrc",	"gdiscreencapsrc" );
-	g_print("source type in create_elements %s\n", gst_element_get_name(gst->source) );
-
+	gst->source           = gst_element_factory_make( "gdiscreencapsrc",	"videotestsrc" );
 	gst->filter           = gst_element_factory_make( "capsfilter", "filter" );
-	g_print("filter type in create_elements %s\n", gst_element_get_name(gst->filter) );
-
 	gst->ffmpegcolorspace = gst_element_factory_make( "ffmpegcolorspace", "ffmpegcolorspace" );
-	g_print("ffmpegcolorspace type in create_elements %s\n", gst_element_get_name(gst->ffmpegcolorspace) );
      
-    if (gst->gtkVars->encoderType)
-    {
-        if( strcmp( gst->gtkVars->encoderType, "Encoder_H264" ) == 0 )
-        {
-            gst->encoder = gst_element_factory_make( "x264enc",	"x264enc" );
-        }
-        else
-        {
-            gst->encoder = gst_element_factory_make( "x264enc",	"x264enc" );
-        }
-    }
+	g_print("\nEncoder type in create_elements %s\n", gst->gtkVars->encoderType );
+	
+    if( strcmp( gst->gtkVars->encoderType, "Encoder_H264" ) == 0 )
+	{
+		gst->encoder          = gst_element_factory_make( "x264enc",	"x264enc" );
+	}
+	else 
+	{
+		gst->encoder          = gst_element_factory_make( "x264enc",	"x264enc" );
+	}
+	
+    if( strcmp( gst->gtkVars->containerFormat, "Container_AVI" ) == 0 )
+	{
+			gst->muxer            = gst_element_factory_make( "avimux", "mux" );
+	}
+	else if( strcmp( gst->gtkVars->containerFormat, "Container_mp4" ) == 0 )
+	{
+		gst->muxer            = gst_element_factory_make( "mp4mux", "mux" );
+	}
     else
-    {
-        gst->encoder = gst_element_factory_make( "x264enc",	"x264enc" );
-    }
-	g_print("Encoder type in create_elements %s\n", gst_element_get_name(gst->encoder) );
+	{
+			gst->muxer            = gst_element_factory_make( "avimux", "mux" );
+	}
+	gst->sink             = gst_element_factory_make( "filesink", "filesink" );
 
-    if (gst->gtkVars->containerFormat)
+    /*if (gst->gtkVars->containerFormat)
     {
         if( strcmp( gst->gtkVars->containerFormat, "Container_AVI" ) == 0 )
         {
@@ -164,13 +167,13 @@ int create_elements( Gst* gst, char* location )
     {
             gst->muxer = gst_element_factory_make( "avimux", "mux" );
     }
-	g_print("muxer type in create_elements %s\n", gst_element_get_name(gst->muxer) );
+	g_print("muxer type in create_elements %s\n", gst_element_get_name(gst->muxer) );*/
 
 	gst->sink = gst_element_factory_make( "filesink", "filesink" );
 	g_print("sink type in create_elements %s\n", gst_element_get_name(gst->sink) );
 
     if (!gst->gtkVars->fps)
-        gst->gtkVars->fps = 20;
+        gst->gtkVars->fps = DEFAULT_FPS;
 
 	/* Video caps */
     gst->video_caps = gst_caps_new_simple( "video/x-raw-rgb", "framerate", GST_TYPE_FRACTION, gst->gtkVars->fps, 1, NULL );
@@ -207,7 +210,6 @@ int create_elements( Gst* gst, char* location )
 int pipeline_make( Gst* gst )
 {
 		/* Add all elements into the pipeline */
-
 		gst_bin_add_many( GST_BIN ( gst->pipeline), gst->source, gst->filter, gst->ffmpegcolorspace, gst->encoder, 
 						 gst->muxer, gst->sink, NULL);
 
@@ -230,25 +232,37 @@ int bus_watcher( Gst* gst )
 int stop_pipeline( GtkWidget *widget, 
 				gpointer   data )
 {
-		g_print("stop pipeline\n");
 		Gst* gst = ( Gst* ) data;
-	    gtk_widget_set_sensitive (widget,FALSE);
-
+		gtk_widget_set_sensitive (widget,FALSE);
+		gtk_widget_set_sensitive ( (GtkWidget*)gst->startButton,TRUE);
+		g_print(" stop pipeline\n");
+		
+	   
 		if( state_handler( gst, GST_STATE_NULL) !=0 )
 				return -1;
 		g_main_loop_quit ( gst->loop );
-
-        gtk_widget_set_sensitive ( widget,TRUE);
-
 		return 0;
 }
+int MainWindowQuit( GtkComboBox *widget, gpointer data )
+{
+		if( !flag )
+		{
+				Gst* gst = ( Gst* ) data;
+				g_print(" stop pipeline\n");
+				if( state_handler( gst, GST_STATE_NULL) !=0 )
+						return -1;
+				g_main_loop_quit ( gst->loop );
+		}
+		gtk_main_quit ();
+		return 0;
 
+}
 int run_pipeline( GtkWidget *widget, gpointer   data )
 {
 
 		Gst* gst = ( Gst* ) data;
-	    gtk_widget_set_sensitive (widget,FALSE);
-           
+		gtk_widget_set_sensitive (widget,FALSE);
+		gtk_widget_set_sensitive ( (GtkWidget*) gst->stopButton,TRUE);
 		/* Initialize elements */
 		if( create_elements( gst, "D:\\test.avi") != 0 )
 				return -1;
@@ -267,7 +281,7 @@ int run_pipeline( GtkWidget *widget, gpointer   data )
 
 		g_print ("Running...\n");
 		g_main_loop_run ( gst->loop); 
-        gtk_widget_set_sensitive ( widget,TRUE);
+
 		return 0;
 }
 
@@ -277,7 +291,6 @@ static void DropboxEncoderFormat( GtkComboBox *widget, gpointer data )
 
 		const gchar *pTEMP = gtk_combo_box_get_active_id (widget);
 
-		(( Gst* )data)->gtkVars->encoderType = malloc( strlen( pTEMP ) + 1);
 
 		strcpy( (( Gst* )data)->gtkVars->encoderType, pTEMP ); 
 
@@ -288,7 +301,6 @@ static void DropboxContainerFormat( GtkComboBox *widget, gpointer data )
 {
 		const gchar *pTEMP = gtk_combo_box_get_active_id (widget);
 
-		((Gst*)data)->gtkVars->containerFormat = malloc( strlen( pTEMP ) + 1 );
 
 		strcpy( (( Gst* )data)->gtkVars->containerFormat, pTEMP ); 
 
@@ -304,31 +316,28 @@ static void DropboxFPS( GtkComboBox *widget, gpointer data )
 static void EntryTopX (GtkEntry *widget, gpointer   data)
 {
 
-		const gchar *pTEMP=gtk_entry_get_text( widget );
-
-       	(( Gst* )data)->gtkVars->topLeftX = atoi( pTEMP );
+		(( Gst* )data)->gtkVars->topLeftX = ( atoi( gtk_entry_get_text( (GtkEntry*)widget ) ) );
+		g_print( "\nvalue of topLeftX = %d\n", (( Gst* )data)->gtkVars->topLeftX );
 
 }
 
 static void EntryTopY (GtkEntry *widget, gpointer   data)
 {
-		const gchar *pTEMP=gtk_entry_get_text(widget);
-
-       	(( Gst* )data)->gtkVars->topLeftY = atoi( pTEMP );
+		(( Gst* )data)->gtkVars->topLeftY = ( atoi( gtk_entry_get_text( (GtkEntry*)widget ) ) );
+		g_print( "\nvalue of topLeftY = %d\n", (( Gst* )data)->gtkVars->topLeftY );
 }
 
 static void EntryHeight (GtkEntry *widget, gpointer   data)
 {
-		const gchar *pTEMP=gtk_entry_get_text(widget);
-
-       	(( Gst* )data)->gtkVars->height = atoi( pTEMP );
+		(( Gst* )data)->gtkVars->height = ( atoi( gtk_entry_get_text( (GtkEntry*)widget ) ) );
+		g_print( "\nvalue of height = %d\n", (( Gst* )data)->gtkVars->height );
 }
 
 static void EntryWidth (GtkEntry *widget, gpointer   data)
 {
-		const gchar *pTEMP=gtk_entry_get_text(widget);
+		(( Gst* )data)->gtkVars->width = ( atoi( gtk_entry_get_text( (GtkEntry*)widget ) ) );
+		g_print( "\nvalue of width = %d\n", (( Gst* )data)->gtkVars->width );
 
-       	(( Gst* )data)->gtkVars->width = atoi( pTEMP );
 }
 
 int main ( int   argc, char *argv[] )
@@ -338,6 +347,7 @@ int main ( int   argc, char *argv[] )
 		GObject *button;
 		GObject *dropdown;
 		GObject *Entry; 
+		GObject* LinkButton;
 
 		/* Gtk Initialisation */
 		gtk_init (&argc, &argv);
@@ -346,6 +356,7 @@ int main ( int   argc, char *argv[] )
 		gst_init (&argc, &argv);
 
 		Gst* gst = (Gst *) malloc (sizeof(Gst) );
+
 		if( gst == NULL )
 		{
 				g_printerr ( "Malloc failed :: gst.\n" );
@@ -358,8 +369,26 @@ int main ( int   argc, char *argv[] )
 				g_printerr ( "Malloc failed :: gtkVars.\n" );
 				return -1;   
 		}
+		gst->gtkVars->encoderType = ( char* )malloc( 20  );
+		if( gst->gtkVars->encoderType == NULL )
+		{
+				g_printerr ( "Malloc failed :: encoderType.\n" );
+				return -1;   
+		}
 
-		gst->loop = g_main_loop_new (NULL, FALSE);
+		gst->gtkVars->containerFormat = ( char* )malloc( 20  );
+		if( gst->gtkVars->containerFormat == NULL )
+		{
+				g_printerr ( "Malloc failed :: encoderType.\n" );
+				return -1;   
+		}
+
+                gst->gtkVars->topLeftX = 0;
+                gst->gtkVars->topLeftY = 0;
+                gst->gtkVars->width    = 0;
+                gst->gtkVars->height   = 0;
+
+                gst->loop = g_main_loop_new (NULL, FALSE);
 
 		/* Construct a GtkBuilder instance and load our UI description */
 		builder = gtk_builder_new ();
@@ -367,16 +396,20 @@ int main ( int   argc, char *argv[] )
 
 		/* Connect signal handlers to the constructed widgets. */
 		window = gtk_builder_get_object (builder, "Main_Application");
-		g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
+		g_signal_connect (window, "destroy", G_CALLBACK (MainWindowQuit), gst);
 
 		gst->startButton  = gtk_builder_get_object (builder, "Button_Start");
+		gst->stopButton = gtk_builder_get_object (builder, "Button_Stop");
+		gtk_widget_set_sensitive ( (GtkWidget*)gst->stopButton,FALSE);
+
+
 		g_signal_connect ( gst->startButton, "clicked", G_CALLBACK (run_pipeline), gst );
 
-		gst->stopButton = gtk_builder_get_object (builder, "Button_Stop");
+
 		g_signal_connect ( gst->stopButton, "clicked", G_CALLBACK (stop_pipeline), gst );
 
 		button = gtk_builder_get_object (builder, "Button_Quit");
-		g_signal_connect (button, "clicked", G_CALLBACK (stop_pipeline), gst );
+		g_signal_connect (button, "destroy", G_CALLBACK (MainWindowQuit), gst );
 
 
 		dropdown = gtk_builder_get_object (builder, "Combobox_Encoder");
@@ -404,9 +437,11 @@ int main ( int   argc, char *argv[] )
 		Entry = gtk_builder_get_object (builder, "Entry_Width");
 		g_signal_connect (Entry, "activate", G_CALLBACK (EntryWidth), gst );
 
+		// url action
+		LinkButton = gtk_builder_get_object (builder, "linkbutton");
+		g_signal_connect (LinkButton, "activate-link", NULL, NULL );
 
 		gtk_main ();
-
 		return 0;
 }
 
