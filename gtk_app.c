@@ -74,9 +74,9 @@ int state_handler( Gst* gst, GstStateChangeReturn state )
 static gboolean my_bus_callback( GstBus* bus, GstMessage *message, gpointer data )
 {
    Gst* gst = ( Gst* ) data;
-   switch( GST_MESSAGE_TYPE (message) ) 
+   switch( GST_MESSAGE_TYPE (message) )
    {
-     case GST_MESSAGE_ERROR: 
+     case GST_MESSAGE_ERROR:
      {
        g_print ("\nGot %s message\n", GST_MESSAGE_TYPE_NAME (message));
        GError *err;
@@ -125,18 +125,18 @@ int create_elements( Gst* gst, char* location )
 	gst->source           = gst_element_factory_make( "gdiscreencapsrc",	"videotestsrc" );
 	gst->filter           = gst_element_factory_make( "capsfilter", "filter" );
 	gst->ffmpegcolorspace = gst_element_factory_make( "ffmpegcolorspace", "ffmpegcolorspace" );
-     
+
 	g_print("\nEncoder type in create_elements %s\n", gst->gtkVars->encoderType );
-	
+
     if( strcmp( gst->gtkVars->encoderType, "Encoder_H264" ) == 0 )
 	{
 		gst->encoder          = gst_element_factory_make( "x264enc",	"x264enc" );
 	}
-	else 
+	else
 	{
 		gst->encoder          = gst_element_factory_make( "x264enc",	"x264enc" );
 	}
-	
+
     if( strcmp( gst->gtkVars->containerFormat, "Container_AVI" ) == 0 )
 	{
 			gst->muxer            = gst_element_factory_make( "avimux", "mux" );
@@ -178,7 +178,7 @@ int create_elements( Gst* gst, char* location )
 	/* Video caps */
     gst->video_caps = gst_caps_new_simple( "video/x-raw-rgb", "framerate", GST_TYPE_FRACTION, gst->gtkVars->fps, 1, NULL );
 
-	if( !gst->pipeline || !gst->source || !gst->filter || !gst->encoder || !gst->muxer || !gst->sink )  
+	if( !gst->pipeline || !gst->source || !gst->filter || !gst->encoder || !gst->muxer || !gst->sink )
 	{
 			g_printerr ( "One element could not be created. Exiting.\n" );
 			return -1;
@@ -210,7 +210,7 @@ int create_elements( Gst* gst, char* location )
 int pipeline_make( Gst* gst )
 {
 		/* Add all elements into the pipeline */
-		gst_bin_add_many( GST_BIN ( gst->pipeline), gst->source, gst->filter, gst->ffmpegcolorspace, gst->encoder, 
+		gst_bin_add_many( GST_BIN ( gst->pipeline), gst->source, gst->filter, gst->ffmpegcolorspace, gst->encoder,
 						 gst->muxer, gst->sink, NULL);
 
 		/* Link the elements together */
@@ -224,20 +224,20 @@ int bus_watcher( Gst* gst )
 		/* Add a message handler */
 		gst->bus = gst_pipeline_get_bus( GST_PIPELINE( gst->pipeline) );
 		gst->bus_watch_id = gst_bus_add_watch( gst->bus, my_bus_callback, gst );
-		gst_object_unref( gst->bus );	
+		gst_object_unref( gst->bus );
 		return 0;
 }
 
 /* This is a callback function. */
-int stop_pipeline( GtkWidget *widget, 
+int stop_pipeline( GtkWidget *widget,
 				gpointer   data )
 {
 		Gst* gst = ( Gst* ) data;
 		gtk_widget_set_sensitive (widget,FALSE);
 		gtk_widget_set_sensitive ( (GtkWidget*)gst->startButton,TRUE);
 		g_print(" stop pipeline\n");
-		
-	   
+
+
 		if( state_handler( gst, GST_STATE_NULL) !=0 )
 				return -1;
 		g_main_loop_quit ( gst->loop );
@@ -280,7 +280,7 @@ int run_pipeline( GtkWidget *widget, gpointer   data )
 				return -1;
 
 		g_print ("Running...\n");
-		g_main_loop_run ( gst->loop); 
+		g_main_loop_run ( gst->loop);
 
 		return 0;
 }
@@ -292,7 +292,7 @@ static void DropboxEncoderFormat( GtkComboBox *widget, gpointer data )
 		const gchar *pTEMP = gtk_combo_box_get_active_id (widget);
 
 
-		strcpy( (( Gst* )data)->gtkVars->encoderType, pTEMP ); 
+		strcpy( (( Gst* )data)->gtkVars->encoderType, pTEMP );
 
 
 }
@@ -302,7 +302,7 @@ static void DropboxContainerFormat( GtkComboBox *widget, gpointer data )
 		const gchar *pTEMP = gtk_combo_box_get_active_id (widget);
 
 
-		strcpy( (( Gst* )data)->gtkVars->containerFormat, pTEMP ); 
+		strcpy( (( Gst* )data)->gtkVars->containerFormat, pTEMP );
 
 }
 
@@ -346,7 +346,7 @@ int main ( int   argc, char *argv[] )
 		GObject *window;
 		GObject *button;
 		GObject *dropdown;
-		GObject *Entry; 
+		GObject *Entry;
 		GObject* LinkButton;
 
 		/* Gtk Initialisation */
@@ -360,27 +360,27 @@ int main ( int   argc, char *argv[] )
 		if( gst == NULL )
 		{
 				g_printerr ( "Malloc failed :: gst.\n" );
-				return -1;   
+				return -1;
 		}
 
 		gst->gtkVars = ( InitGtkVariables* )malloc( sizeof( InitGtkVariables)  );
 		if( gst->gtkVars == NULL )
 		{
 				g_printerr ( "Malloc failed :: gtkVars.\n" );
-				return -1;   
+				return -1;
 		}
 		gst->gtkVars->encoderType = ( char* )malloc( 20  );
 		if( gst->gtkVars->encoderType == NULL )
 		{
 				g_printerr ( "Malloc failed :: encoderType.\n" );
-				return -1;   
+				return -1;
 		}
 
 		gst->gtkVars->containerFormat = ( char* )malloc( 20  );
 		if( gst->gtkVars->containerFormat == NULL )
 		{
 				g_printerr ( "Malloc failed :: encoderType.\n" );
-				return -1;   
+				return -1;
 		}
 
                 gst->gtkVars->topLeftX = 0;
