@@ -37,6 +37,6 @@ CC = gcc
 
 CFLAGS = -g -Wall
 
-hellomake: gtk_app.c
+ScreenRec: gtk_app.c
 	${CC} ${CFLAGS} $? ${INCLUDES} -o $@ ${OBJS} ${LIBS} ${LDPATH}
 
