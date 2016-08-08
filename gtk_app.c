@@ -289,6 +289,9 @@ int start_pipeline( GtkWidget *widget, gpointer   data )
         /* take the current time start time */
         time (&gst->t_start);
 
+        /* To obtain .dot files, set the GST_DEBUG_DUMP_DOT_DIR environment 
+        variable to point to the folder where you want the files to be placed. */
+
         GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN(gst->pipeline),
             GST_DEBUG_GRAPH_SHOW_ALL, "gstcapture-1.0-playing");
 
