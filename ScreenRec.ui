@@ -1,8 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.18.3 -->
 <interface>
-  <object id="Main_Application" class="GtkWindow">
+  <requires lib="gtk+" version="3.6"/>
+  <object class="GtkWindow" id="Main_Application">
     <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="border_width">10</property>
     <property name="title">Grid</property>
-    <property name="border-width">10</property>
     <child>
       <object class="GtkFrame" id="Frame_Main">
         <property name="visible">True</property>
@@ -36,8 +40,6 @@
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="top_attach">4</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -53,8 +55,6 @@
                   <packing>
                     <property name="left_attach">0</property>
                     <property name="top_attach">7</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -67,8 +67,6 @@
                   <packing>
                     <property name="left_attach">0</property>
                     <property name="top_attach">6</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -85,8 +83,6 @@
                   <packing>
                     <property name="left_attach">0</property>
                     <property name="top_attach">5</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -101,8 +97,6 @@
                   <packing>
                     <property name="left_attach">0</property>
                     <property name="top_attach">4</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -115,8 +109,6 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="top_attach">7</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -130,8 +122,6 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="top_attach">6</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -142,24 +132,22 @@
                     <property name="margin_right">40</property>
                     <property name="button_sensitivity">on</property>
                     <items>
-					  <item id="Framerate_10" translatable="yes">10</item>
+                      <item id="Framerate_10" translatable="yes">10</item>
                       <item id="Framerate_15" translatable="yes">15</item>
-					  <item id="Framerate_20" translatable="yes">20</item>
+                      <item id="Framerate_20" translatable="yes">20</item>
                       <item id="Framerate_25" translatable="yes">25</item>
                       <item id="Framerate_30" translatable="yes">30</item>
-					  <item id="Framerate_35" translatable="yes">35</item>
+                      <item id="Framerate_35" translatable="yes">35</item>
                       <item id="Framerate_40" translatable="yes">40</item>
-					  <item id="Framerate_45" translatable="yes">45</item>
-					  <item id="Framerate_50" translatable="yes">50</item>
-					  <item id="Framerate_55" translatable="yes">55</item>
+                      <item id="Framerate_45" translatable="yes">45</item>
+                      <item id="Framerate_50" translatable="yes">50</item>
+                      <item id="Framerate_55" translatable="yes">55</item>
                       <item id="Framerate_60" translatable="yes">60</item>
                     </items>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="top_attach">5</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -174,8 +162,6 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="top_attach">4</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -190,8 +176,6 @@
                   <packing>
                     <property name="left_attach">3</property>
                     <property name="top_attach">4</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -200,14 +184,13 @@
                     <property name="can_focus">True</property>
                     <property name="margin_left">22</property>
                     <property name="margin_top">3</property>
+                    <property name="max_length">4</property>
                     <property name="xalign">1</property>
                     <property name="input_purpose">digits</property>
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
                     <property name="top_attach">7</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -225,8 +208,6 @@
                   <packing>
                     <property name="left_attach">4</property>
                     <property name="top_attach">8</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -241,8 +222,6 @@
                   <packing>
                     <property name="left_attach">5</property>
                     <property name="top_attach">8</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -257,8 +236,6 @@
                   <packing>
                     <property name="left_attach">6</property>
                     <property name="top_attach">8</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -272,8 +249,6 @@
                   <packing>
                     <property name="left_attach">3</property>
                     <property name="top_attach">6</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -282,15 +257,15 @@
                     <property name="height_request">-1</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="max_length">4</property>
                     <property name="xalign">1</property>
+                    <property name="shadow_type">none</property>
                     <property name="input_purpose">digits</property>
                     <signal name="activate" handler="height" object="applicationwindow1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="top_attach">7</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -303,8 +278,6 @@
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="top_attach">6</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -319,7 +292,6 @@
                     <property name="left_attach">1</property>
                     <property name="top_attach">1</property>
                     <property name="width">3</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -328,14 +300,13 @@
                     <property name="height_request">-1</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="max_length">4</property>
                     <property name="xalign">1</property>
                     <property name="input_purpose">digits</property>
                   </object>
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="top_attach">5</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -344,14 +315,13 @@
                     <property name="can_focus">True</property>
                     <property name="margin_left">25</property>
                     <property name="margin_top">3</property>
+                    <property name="max_length">4</property>
                     <property name="xalign">1</property>
                     <property name="input_purpose">digits</property>
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
                     <property name="top_attach">5</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -363,8 +333,6 @@
                   <packing>
                     <property name="left_attach">0</property>
                     <property name="top_attach">3</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -376,7 +344,6 @@
                     <property name="left_attach">1</property>
                     <property name="top_attach">3</property>
                     <property name="width">3</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -387,8 +354,6 @@
                   <packing>
                     <property name="left_attach">4</property>
                     <property name="top_attach">3</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -401,8 +366,6 @@
                   <packing>
                     <property name="left_attach">0</property>
                     <property name="top_attach">2</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -442,7 +405,6 @@
                     <property name="left_attach">1</property>
                     <property name="top_attach">2</property>
                     <property name="width">3</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
@@ -455,35 +417,79 @@
                     <property name="left_attach">1</property>
                     <property name="top_attach">0</property>
                     <property name="width">3</property>
-                    <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkLabel" id="Label_ElapsedTime">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Time Elapsed</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">4</property>
+                    <property name="top_attach">5</property>
+                    <property name="width">2</property>
+                  </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkLabel" id="Label_ActualTime">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">00:00:00</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">6</property>
+                    <property name="top_attach">5</property>
+                  </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkLabel" id="Label_ElapsedTime1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="valign">center</property>
+                    <property name="label" translatable="yes">Enter Time </property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">4</property>
+                    <property name="top_attach">4</property>
+                  </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkEntry" id="Entry_Time">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="max_length">9</property>
+                    <property name="placeholder_text" translatable="yes">00:00:00</property>
+                    <property name="input_purpose">number</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">5</property>
+                    <property name="top_attach">4</property>
+                    <property name="width">2</property>
+                  </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkLabel" id="Label_RemainedTime">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">00:00:00</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">6</property>
+                    <property name="top_attach">6</property>
+                  </packing>
                 </child>
                 <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
+                  <object class="GtkLabel" id="Label_RemainingTimelabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Time Remaining</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">4</property>
+                    <property name="top_attach">6</property>
+                    <property name="width">2</property>
+                  </packing>
                 </child>
                 <child>
                   <placeholder/>

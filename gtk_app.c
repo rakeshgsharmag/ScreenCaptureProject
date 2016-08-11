@@ -1,5 +1,13 @@
 #include "gtk_app.h"
 
+int stop_pipeline( GtkWidget *widget,gpointer   data );
+
+bool fileExists(const char* file)
+{
+    struct stat buf;
+    return (stat(file, &buf) == 0);
+}
+
 int state_handler( Gst* gst, GstStateChangeReturn state )
 {
     GstStateChangeReturn ret = GST_STATE_CHANGE_SUCCESS;
@@ -89,7 +97,6 @@ static gboolean my_bus_callback( GstBus* bus, GstMessage *message, gpointer data
      case GST_MESSAGE_EOS:
      {
        GST_DEBUG ("\nGot %s message\n", GST_MESSAGE_TYPE_NAME (message));
-       state_handler ( gst, GST_STATE_NULL);
        /* end-of-stream */
        g_main_loop_quit ( gst->loop );
        break;
@@ -104,6 +111,39 @@ static gboolean my_bus_callback( GstBus* bus, GstMessage *message, gpointer data
     */
   return TRUE;
 }
+
+static gboolean TimeUpdate( void* data)
+{
+        time_t TimeRemained;
+        Gst* gst = ( Gst* ) data;
+        time ( &gst->t_Rawtime );
+        gst->t_Rawtime = difftime ( gst->t_Rawtime,gst->t_start)-19800;
+
+        gchar *pSTR=ctime(&gst->t_Rawtime);
+        *(pSTR+20)='\0';
+        gtk_label_set_text ((GtkLabel*)gst->TimeDisplay,pSTR+10);
+        TimeRemained=difftime (gst->t_SetTime,gst->t_Rawtime)-19800*2;
+
+        gchar *pSTR2=ctime(&TimeRemained);
+        *(pSTR2+20)='\0';
+        gtk_label_set_text ((GtkLabel*)gst->TimeRemained,pSTR+10);
+        gst->t_Rawtime=gst->t_Rawtime+19800;
+        if((gst->t_SetTime-gst->t_Rawtime < 1)&&(gst->t_SetTime>0))
+        {
+            stop_pipeline( NULL,gst);
+            gtk_widget_set_sensitive ((GtkWidget*)gst->stopButton,FALSE);
+            return FALSE;
+        }
+         if (gtk_widget_get_sensitive ((GtkWidget*)gst->stopButton)==TRUE)
+            return 1;
+        else
+            return FALSE;
+}
+
+
+
+
+
 
 int create_elements( Gst* gst, char* location )
 {
@@ -199,11 +239,14 @@ int create_elements( Gst* gst, char* location )
                     gst->gtkVars->width,gst->gtkVars->height);
 
     /* we set the input filename to the source element */
-    g_object_set( G_OBJECT( gst->sink ), "location", location, NULL );
+    //g_object_set( G_OBJECT( gst->sink ), "location", location, NULL );
+    g_object_set( G_OBJECT( gst->sink ), "location", gst->fileLocation, NULL );
 
     return 0;
 
 }
+
+
 
 int pipeline_make( Gst* gst )
 {
@@ -242,7 +285,7 @@ int stop_pipeline( GtkWidget *widget,
 
         /* calculate time spent */
         difft = difftime (gst->t_end,gst->t_start);
-
+        gst->t_end=0;
         g_print ("Total time = %f seconds\n", difft);
 
         if( state_handler( gst, GST_STATE_NULL) !=0 )
@@ -267,6 +310,8 @@ int MainWindowQuit( GtkComboBox *widget, gpointer data )
 int start_pipeline( GtkWidget *widget, gpointer   data )
 {
 
+    //thred creation
+
         Gst* gst = ( Gst* ) data;
         gtk_widget_set_sensitive (widget,FALSE);
         gtk_widget_set_sensitive ( (GtkWidget*) gst->stopButton,TRUE);
@@ -288,8 +333,15 @@ int start_pipeline( GtkWidget *widget, gpointer   data )
 
         /* take the current time start time */
         time (&gst->t_start);
+        //gst->t_SetTime= gst->t_SetTime+gst->t_start;
+        if(gst->t_SetTime<1)
+            gtk_widget_hide ((GtkWidget*)gst->TimeRemained);
+        else
+            gtk_widget_show((GtkWidget*)gst->TimeRemained);
 
-        /* To obtain .dot files, set the GST_DEBUG_DUMP_DOT_DIR environment 
+        g_timeout_add (1000,(GSourceFunc)TimeUpdate,(gpointer)gst);
+
+        /* To obtain .dot files, set the GST_DEBUG_DUMP_DOT_DIR environment
         variable to point to the folder where you want the files to be placed. */
 
         GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN(gst->pipeline),
@@ -304,22 +356,14 @@ int start_pipeline( GtkWidget *widget, gpointer   data )
 
 static void DropboxEncoderFormat( GtkComboBox *widget, gpointer data )
 {
-
         const gchar *pTEMP = gtk_combo_box_get_active_id (widget);
-
-
         strcpy( (( Gst* )data)->gtkVars->encoderType, pTEMP );
-
-
 }
 
 static void DropboxContainerFormat( GtkComboBox *widget, gpointer data )
 {
         const gchar *pTEMP = gtk_combo_box_get_active_id (widget);
-
-
         strcpy( (( Gst* )data)->gtkVars->containerFormat, pTEMP );
-
 }
 
 static void DropboxFPS( GtkComboBox *widget, gpointer data )
@@ -356,6 +400,66 @@ static void EntryWidth (GtkEntry *widget, gpointer   data)
 
 }
 
+static void EntryTime (GtkEntry *widget, gpointer   data)
+{
+
+   char* copy = strdup( gtk_entry_get_text( (GtkEntry*)widget ));
+   char *token;
+   token = strtok(copy, ":");
+   int i=2;
+   time_t TotalSeconds=0;
+   /* walk through other tokens */
+   while( (token != NULL) ||(i==0))
+   {
+      if(atoi(token)>59)
+          TotalSeconds=60*(pow (60,i))+TotalSeconds;
+    else
+      TotalSeconds=atoi(token)*(pow (60,i))+TotalSeconds;
+      token = strtok(NULL, ":");
+      i--;
+   }
+   (( Gst* )data)->t_SetTime=TotalSeconds;
+
+}
+
+
+static void EntryFile (GtkEntry *widget, gpointer   data)
+{
+
+        const char* temp = NULL;
+        int fd;
+        bool ret;
+
+        temp = gtk_entry_get_text( (GtkEntry*)widget );
+        stat( temp, &st );
+
+        if( S_ISDIR( st.st_mode )  )
+        {
+                gtk_entry_set_text( (GtkEntry*)widget, "***It is directory enter path with file name***" );
+        }
+        else
+        {
+                ret = fileExists( temp );
+                if( ret )
+                {
+                        strcpy( (( Gst* )data)->fileLocation, temp );
+                }
+                else
+                {
+                        fd = open(temp, O_WRONLY | O_CREAT, 0644);
+                        if( fd == -1)
+                        {
+                                GST_ERROR ( "ERROR :: incorrect file.\n" );
+                        }
+                        strcpy( (( Gst* )data)->fileLocation, temp );
+                }
+
+        }
+}
+
+
+
+
 int main ( int   argc, char *argv[] )
 {
         GtkBuilder *builder;
@@ -371,6 +475,8 @@ int main ( int   argc, char *argv[] )
         /* Gstreamer Initialisation */
         gst_init (&argc, &argv);
 
+
+
         Gst* gst = (Gst *) malloc (sizeof(Gst) );
 
         if( gst == NULL )
@@ -385,10 +491,24 @@ int main ( int   argc, char *argv[] )
                 GST_ERROR ( "Malloc failed :: gtkVars.\n" );
                 return -1;
         }
+
+        /*gst->StopTimeVariables = ( TimeVariables* )malloc( sizeof( TimeVariables)  );
+        if( gst->gtkVars == NULL )
+        {
+                GST_ERROR ( "Malloc failed :: TimeVariables.\n" );
+                return -1;
+        }*/
         gst->gtkVars->encoderType = ( char* )malloc( 20  );
         if( gst->gtkVars->encoderType == NULL )
         {
                 GST_ERROR ( "Malloc failed :: encoderType.\n" );
+                return -1;
+        }
+
+            gst->fileLocation = ( char* )malloc( 100 );
+        if( gst->fileLocation == NULL )
+        {
+                GST_ERROR ( "Malloc failed :: fileLocation.\n" );
                 return -1;
         }
 
@@ -398,15 +518,17 @@ int main ( int   argc, char *argv[] )
                 GST_ERROR ( "Malloc failed :: encoderType.\n" );
                 return -1;
         }
-
+                strcpy(gst->fileLocation, "D:\\test.avi");
                 gst->gtkVars->topLeftX = 0;
                 gst->gtkVars->topLeftY = 0;
                 gst->gtkVars->width    = 0;
                 gst->gtkVars->height   = 0;
-
+                gst->t_SetTime         = 0;
                 gst->loop = g_main_loop_new (NULL, FALSE);
 
         /* Construct a GtkBuilder instance and load our UI description */
+        //g_timeout_add (1000,(GSourceFunc)TimeUpdate,(gpointer)gst);
+        //gdk_threads_add_timeout_full (G_PRIORITY_DEFAULT_IDLE ,1000,GSourceFunc function,gst,NULL);
         builder = gtk_builder_new ();
         gtk_builder_add_from_file (builder, "ScreenRec.ui", NULL);
 
@@ -425,7 +547,7 @@ int main ( int   argc, char *argv[] )
         g_signal_connect ( gst->stopButton, "clicked", G_CALLBACK (stop_pipeline), gst );
 
         button = gtk_builder_get_object (builder, "Button_Quit");
-        g_signal_connect (button, "destroy", G_CALLBACK (MainWindowQuit), gst );
+        g_signal_connect (button, "clicked", G_CALLBACK (MainWindowQuit), gst );
 
 
         dropdown = gtk_builder_get_object (builder, "Combobox_Encoder");
@@ -456,6 +578,23 @@ int main ( int   argc, char *argv[] )
         // url action
         LinkButton = gtk_builder_get_object (builder, "linkbutton");
         g_signal_connect (LinkButton, "activate-link", NULL, NULL );
+
+        gst->TimeDisplay = gtk_builder_get_object (builder, "Label_ActualTime");
+        gst->TimeRemained=gtk_builder_get_object (builder,"Label_RemainedTime");
+
+        Entry = gtk_builder_get_object (builder, "Entry_Time");
+        g_signal_connect (Entry, "activate", G_CALLBACK (EntryTime), gst );
+
+        Entry = gtk_builder_get_object (builder, "Entry_File");
+        gtk_entry_set_text( (GtkEntry*)Entry, "***Default path will be ""D:\\test.avi""***" );
+        g_signal_connect (Entry, "activate", G_CALLBACK (EntryFile), gst );
+
+        /*Entry = gtk_builder_get_object (builder, "Label_Minute");
+        g_signal_connect (Entry, "activate", G_CALLBACK (EntryWidth), gst );
+
+        Entry = gtk_builder_get_object (builder, "Label_Second");
+        g_signal_connect (Entry, "activate", G_CALLBACK (EntryWidth), gst );
+*/
 
         gtk_main ();
         return 0;

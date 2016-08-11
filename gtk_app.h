@@ -10,8 +10,17 @@
 #include <string.h>
 #include <pthread.h>
 #include <time.h>
-
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <math.h>
 int flag = 0;
+
+
+struct stat st, st1;
+typedef int bool;
+#define true 1
+#define false 0
+
 
 //default values for co-ordinates and frame rate and co-ordinates
 #define MAX_TOP_LEFT_X                1023
@@ -30,6 +39,13 @@ int flag = 0;
 #define DEFAULT_HEIGHT                480
 #define DEFAULT_FPS                   20
 
+
+
+//thread creation
+typedef pthread_t ThreadTimePrint;
+
+
+
 typedef struct
 {
     int   topLeftX;
@@ -41,6 +57,8 @@ typedef struct
     char* containerFormat;
 
 }InitGtkVariables;
+
+
 
 typedef struct
 {
@@ -60,7 +78,10 @@ typedef struct
     InitGtkVariables* gtkVars;
     GObject           *startButton;
     GObject           *stopButton;
-    time_t t_start, t_end;
+    GObject           *TimeDisplay;
+    GObject           *TimeRemained;
+    char              *fileLocation;
+    time_t t_start, t_end,t_SetTime,t_Rawtime;
 
 }Gst;
 #endif /* __VIDEOCAPTURE__*/
