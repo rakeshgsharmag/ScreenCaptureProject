@@ -56,7 +56,7 @@ typedef struct
     char* encoderType;
     char* containerFormat;
 
-}InitGtkVariables;
+}InitQtVariables;
 
 
 
@@ -75,13 +75,15 @@ typedef struct
     GstCaps*          video_caps;
     GstBus*           bus;
     guint             bus_watch_id;
-    InitGtkVariables* gtkVars;
     GObject           *startButton;
     GObject           *stopButton;
     GObject           *TimeDisplay;
     GObject           *TimeRemained;
     char              *fileLocation;
-    time_t t_start, t_end,t_SetTime,t_Rawtime;
+    time_t            t_start, t_end;
+    time_t            t_SetTime,t_Rawtime;
+    InitQtVariables*  qtVars;
+    char*             command;
 
 }Gst;
 #endif /* __VIDEOCAPTURE__*/

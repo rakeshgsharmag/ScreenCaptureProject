@@ -76,7 +76,7 @@
                     <property name="margin_right">40</property>
                     <property name="button_sensitivity">on</property>
                     <items>
-                      <item id="container_mp4" translatable="yes">mp4</item>
+                      <item id="Container_mp4" translatable="yes">mp4</item>
                       <item id="Container_AVI" translatable="yes">AVI</item>
                     </items>
                   </object>
